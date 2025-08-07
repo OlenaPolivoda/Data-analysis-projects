@@ -1,0 +1,14 @@
+SELECT p.date, 'cost' as type,
+sum (p.cost) as value,
+FROM `data-analytics-mate.DA.paid_search_cost` p
+group by p.date
+union all
+select s.date, 'revenue' as type,
+sum (pr.price) as value
+from `data-analytics-mate.DA.session` s
+join `data-analytics-mate.DA.order` o  
+on s.ga_session_id = o.ga_session_id
+join `data-analytics-mate.DA.product` pr
+on o.item_id = pr.item_id
+group by s.date
+order by 1
