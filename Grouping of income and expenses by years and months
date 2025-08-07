@@ -1,0 +1,26 @@
+select
+extract(year from date) as year,
+extract(month from date) as month,
+sum (revenue) as revenue,
+sum (cost) as cost
+from (
+select s.date,
+extract(year from date) as year,
+extract(month from date) as month,
+sum (pr.price) as revenue,
+0 as cost
+from `data-analytics-mate.DA.session` s
+join `data-analytics-mate.DA.order` o
+on s.ga_session_id = o.ga_session_id
+join `data-analytics-mate.DA.product` pr
+on o.item_id = pr.item_id
+group by s.date
+union all
+select date,
+extract(year from date) as year,
+extract(month from date) as month,
+0 as revenue,
+sum (cost) as cost
+from `data-analytics-mate.DA.paid_search_cost` p
+group by date) union_all  
+group by year, month
