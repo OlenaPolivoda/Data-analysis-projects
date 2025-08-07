@@ -1,0 +1,29 @@
+select date, revenue, acc_revenue, predict, acc_predict,
+acc_revenue / acc_predict * 100 as revenue_predict_persent
+from(
+select date, revenue,
+sum(revenue) over (order by date) as acc_revenue,
+predict,
+sum(predict) over (order by date) as acc_predict,
+from (
+select date,
+#extract(day from date) as day,
+sum(revenue) as revenue,
+sum(predict) as predict
+from(
+select s.date,
+sum(price) as revenue,
+0 as predict
+FROM `data-analytics-mate.DA.session` s
+join `data-analytics-mate.DA.order` o
+on s.ga_session_id = o.ga_session_id
+join `data-analytics-mate.DA.product` p
+on o.item_id = p.item_id
+group by s.date
+union all
+select date,
+0 as revenue,
+sum(predict) as predict
+from `data-analytics-mate.DA.revenue_predict` rp
+group by date) union_date
+group by date) union_date2) union_all
